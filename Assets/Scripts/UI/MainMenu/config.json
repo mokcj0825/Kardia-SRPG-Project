@@ -1,0 +1,29 @@
+{
+  "buttons": [
+    {
+      "id": "start_game",
+      "tooltip": "开始游戏",
+      "x": 1
+    },
+    {
+      "id": "load_game",
+      "tooltip": "读取存档",
+      "x": 2
+    },
+    {
+      "id": "config",
+      "tooltip": "系统设置",
+      "x": 3
+    },
+    {
+      "id": "extras",
+      "tooltip": "其他",
+      "x": 4
+    },
+    {
+      "id": "quit",
+      "tooltip": "退出游戏",
+      "x": 5
+    }
+  ]
+}
