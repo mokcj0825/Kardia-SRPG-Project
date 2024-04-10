@@ -3,27 +3,36 @@
     {
       "id": "start_game",
       "tooltip": "开始游戏",
-      "x": 1
+      "x": 1,
+      "onClick": "StartGame"
     },
     {
       "id": "load_game",
       "tooltip": "读取存档",
-      "x": 2
+      "x": 2,
+      "onClick": "LoadGame"
     },
     {
       "id": "config",
       "tooltip": "系统设置",
-      "x": 3
+      "x": 3,
+      "onClick": "Config"
     },
     {
       "id": "extras",
       "tooltip": "其他",
-      "x": 4
+      "x": 4,
+      "onClick": "Extras"
     },
     {
       "id": "quit",
       "tooltip": "退出游戏",
-      "x": 5
+      "x": 5,
+      "onClick": "Exit"
     }
-  ]
+  ],
+  "global": {
+    "loadBackground": false,
+    "loadSound": false
+  }
 }
