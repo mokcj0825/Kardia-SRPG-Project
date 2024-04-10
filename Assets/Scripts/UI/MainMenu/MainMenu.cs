@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using System.IO;
+using System.Reflection;
 
 public class MainMenu : UIControllerBase
 {
@@ -25,51 +26,37 @@ public class MainMenu : UIControllerBase
             CreateButton(button);
             
         }
-        LoadBackgroundImage();
-        LoadAndPlayThemeSong();
+        if (menuConfig.global.loadBackground)
+        {
+            LoadBackgroundImage();
+        }
+        if(menuConfig.global.loadSound)
+        {
+            LoadAndPlayThemeSong();
+        }
     }
 
     private void CreateButton(ButtonConfig buttonConfig)
     {
-        // Create a new button GameObject
-        GameObject buttonObj = new GameObject(buttonConfig.id);
-        buttonObj.AddComponent<RectTransform>(); // Add RectTransform for UI positioning
-        Button button = buttonObj.AddComponent<Button>(); // Add Button component
-        Image buttonImage = buttonObj.AddComponent<Image>(); // Add Image component for button visuals
-        buttonObj.AddComponent<CanvasRenderer>(); // Required for UI rendering
-
-        // Set parent to the canvas
-        buttonObj.transform.SetParent(mainMenuCanvas.transform, false);
-
-        // Optionally, set button colors or add a sprite to buttonImage
-        buttonImage.color = Color.white; // Example: Set to white or use a sprite
-
-        // Set button text
-        GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(buttonObj.transform, false);
-        Text buttonText = textObj.AddComponent<Text>();
-        buttonText.text = buttonConfig.tooltip;
-        buttonText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); // Example: Using built-in Arial font
-        buttonText.alignment = TextAnchor.MiddleCenter;
-        buttonText.color = Color.black;
-
-        // Adjust RectTransform of the button and text
-        RectTransform rectTransform = buttonObj.GetComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(160, 30); // Example: Set button size
-        rectTransform.anchoredPosition = new Vector2(200, 40 - 40 * buttonConfig.x); // Example: Position it. You'd adjust this based on layout.
-
-        // Assigning a default Unity button sprite (optional)
-        //buttonImage.sprite = UnityEngine.UI.SpriteState.allSprites.FirstOrDefault(); // You may want to use a specific sprite
-
-        // TODO: Add listeners to the button to define its behavior
-        button.onClick.AddListener(() => OnButtonClick(buttonConfig.id));
+        GameObject buttonObj = CreateButtonObject(buttonConfig.id);
+        ConfigureButtonAppearance(buttonObj);
+        CreateButtonText(buttonObj, buttonConfig.tooltip);
+        ConfigureButtonRectTransform(buttonObj, 160, 30,  200, 40 - 40 * buttonConfig.x);
+        AssignButtonAction(buttonObj.GetComponent<Button>(), buttonConfig);
     }
 
-    void OnButtonClick(string buttonId)
+    void OnButtonClick(ButtonConfig buttonConfig)
     {
         // Handle button click events based on buttonId
-        Debug.Log($"Button {buttonId} clicked!");
-
+        Debug.Log($"Button {buttonConfig.onClick} clicked!");
+        MethodInfo mi = this.GetType().GetMethod(buttonConfig.onClick, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        if(mi != null)
+        {
+            mi.Invoke(this, null);
+        } else
+        {
+            Debug.LogError("Method not found: " + buttonConfig.onClick);
+        }
         // Example: Load different scenes or perform actions based on buttonId
     }
 
@@ -93,17 +80,15 @@ public class MainMenu : UIControllerBase
         backgroundImage = new GameObject("BackgroundImage").AddComponent<Image>();
         backgroundImage.transform.SetParent(mainMenuCanvas.transform, false);
         backgroundImage.sprite = Resources.Load<Sprite>("Images/MainMenuBackground");
-        // Set the Image type to preserve the aspect ratio
         backgroundImage.type = Image.Type.Sliced;
         backgroundImage.preserveAspect = true;
 
-        // Get the RectTransform and set its anchors and pivot to stretch across the parent
         RectTransform rectTransform = backgroundImage.GetComponent<RectTransform>();
-        rectTransform.anchorMin = new Vector2(0, 0); // Anchors to the bottom-left corner
-        rectTransform.anchorMax = new Vector2(1, 1); // Anchors to the top-right corner
-        rectTransform.pivot = new Vector2(0.5f, 0.5f); // Pivot in the center
-        rectTransform.offsetMin = Vector2.zero; // No offset for the lower bound
-        rectTransform.offsetMax = Vector2.zero; // No offset for the upper bound
+        rectTransform.anchorMin = new Vector2(0, 0); 
+        rectTransform.anchorMax = new Vector2(1, 1);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f); 
+        rectTransform.offsetMin = Vector2.zero; 
+        rectTransform.offsetMax = Vector2.zero; 
         rectTransform.SetAsFirstSibling();
     }
 
@@ -116,7 +101,58 @@ public class MainMenu : UIControllerBase
 
     private void StartGame()
     {
-        SceneManager.LoadScene("GameScene");
+        Debug.Log("Start Game.");
+        //Initialize start
+        string storagePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "Kardia Project Save", "storage");
+        globalConfigFile = Path.Combine(storagePath, "global.config.json");
+        Directory.CreateDirectory(storagePath);
+        if(!File.Exists(globalConfigFile))
+        {
+            CreateGlobalConfig();
+        }
+        //Initialize end
+
+        if(File.Exists(autoSaveFile))
+        {
+            DeleteAutoSave();
+        }
+        Directory.CreateDirectory(autoSavePath);
+        CreateAutoSave();
+
+        //SceneManager.LoadScene("GameScene");
+    }
+
+    private void DeleteAutoSave()
+    {
+        try
+        {
+            File.Delete(autoSaveFile);
+            Debug.Log($"Deleted existing autosave file: {autoSaveFile}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error deleting autosave file: {ex.Message}");
+        }
+    }
+
+    private void CreateAutoSave()
+    {
+        try
+        {
+            File.WriteAllText(autoSaveFile, "");
+            Debug.Log($"Created new autosave file at: {autoSaveFile}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error creating autosave file: {ex.Message}");
+        }
+    }
+
+    private void CreateGlobalConfig()
+    {
+        string defaultConfigJson = "{\"setting1\": \"value1\", \"setting2\": true}";
+        File.WriteAllText(globalConfigFile, defaultConfigJson);
+        Debug.Log($"Created new global.config.json at: {globalConfigFile}");
     }
 
     private void LoadGame()
@@ -142,4 +178,55 @@ public class MainMenu : UIControllerBase
         Application.Quit();
 #endif
     }
+
+
+    private GameObject CreateButtonObject(string buttonId)
+    {
+        GameObject buttonObj = new GameObject(buttonId);
+        buttonObj.AddComponent<RectTransform>();
+        buttonObj.transform.SetParent(mainMenuCanvas.transform, false);
+        return buttonObj;
+    }
+
+    private void ConfigureButtonAppearance(GameObject buttonObj)
+    {
+        Button button = buttonObj.AddComponent<Button>();
+        Image buttonImage = buttonObj.AddComponent<Image>();
+        buttonImage.color = Color.white;
+        // TODO: Set image sprite for button if necessary
+        // buttonImage.sprite = UnityEngine.UI.SpriteState.allSprites.FirstOrDefault();
+    }
+
+    private void CreateButtonText(GameObject buttonObj, string tooltip)
+    {
+        GameObject textObj = new GameObject("Text");
+        textObj.transform.SetParent(buttonObj.transform, false);
+        Text buttonText = textObj.AddComponent<Text>();
+
+        RectTransform textRect = textObj.GetComponent<RectTransform>();
+        textRect.anchorMin = new Vector2(0, 0);
+        textRect.anchorMax = new Vector2(1, 1);
+        textRect.sizeDelta = Vector2.zero;
+        textRect.anchoredPosition = Vector2.zero;
+
+        buttonText.text = tooltip;
+        buttonText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); // Ensure this font exists
+        buttonText.alignment = TextAnchor.MiddleCenter;
+        buttonText.color = Color.black;
+    }
+
+    private void ConfigureButtonRectTransform(GameObject buttonObj, float width, float height, int xPosition, int yPosition)
+    {
+        RectTransform rectTransform = buttonObj.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(width, height); // Adjust size as needed
+        rectTransform.anchoredPosition = new Vector2(xPosition, yPosition); // Adjust position as needed
+    }
+
+    private void AssignButtonAction(Button button, ButtonConfig buttonConfig)
+    {
+        button.onClick.AddListener(() => OnButtonClick(buttonConfig));
+    }
+
+
+
 }

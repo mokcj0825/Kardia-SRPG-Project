@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class UIControllerBase : MonoBehaviourBase
 {
+    //protected string autoStoragePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "Kardia Project Save", "save");
+    protected string autoSavePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+         "Kardia Project Save", "save");
+    protected string autoSaveFile = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+        "Kardia Project Save", "save", "autosave.json");
+    protected string globalConfigFile;
     // Use this method to initialize any UI components
     protected override void Start()
     {
