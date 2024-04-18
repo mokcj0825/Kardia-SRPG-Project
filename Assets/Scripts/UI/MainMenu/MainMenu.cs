@@ -7,17 +7,18 @@ using System.Reflection;
 
 public class MainMenu : UIControllerBase
 {
-    // Assuming you have a canvas in your scene where UI elements can be instantiated
-    private Canvas mainMenuCanvas;
 
     private MenuConfig menuConfig;
 
     private AudioSource audioSource;
     private Image backgroundImage;
 
+  
+
     void Start()
     {
-        mainMenuCanvas = FindObjectOfType<Canvas>(); // Find the canvas in the scene
+        base.Start();
+        canvas = FindObjectOfType<Canvas>(); // Find the canvas in the scene
         audioSource = gameObject.AddComponent<AudioSource>(); // Add an AudioSource component dynamically
         
         LoadMenuConfig();
@@ -78,7 +79,7 @@ public class MainMenu : UIControllerBase
     private void LoadBackgroundImage()
     {
         backgroundImage = new GameObject("BackgroundImage").AddComponent<Image>();
-        backgroundImage.transform.SetParent(mainMenuCanvas.transform, false);
+        backgroundImage.transform.SetParent(canvas.transform, false);
         backgroundImage.sprite = Resources.Load<Sprite>("Images/MainMenuBackground");
         backgroundImage.type = Image.Type.Sliced;
         backgroundImage.preserveAspect = true;
@@ -99,77 +100,34 @@ public class MainMenu : UIControllerBase
         audioSource.Play();
     }
 
+    [UsedInConfig]
     private void StartGame()
     {
         Debug.Log("Start Game.");
-        //Initialize start
-        string storagePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "Kardia Project Save", "storage");
-        globalConfigFile = Path.Combine(storagePath, "global.config.json");
-        Directory.CreateDirectory(storagePath);
-        if(!File.Exists(globalConfigFile))
-        {
-            CreateGlobalConfig();
-        }
-        //Initialize end
-
-        if(File.Exists(autoSaveFile))
-        {
-            DeleteAutoSave();
-        }
-        Directory.CreateDirectory(autoSavePath);
-        CreateAutoSave();
-
-        //SceneManager.LoadScene("GameScene");
+        fileManager.InitializeGlobalConfig();
+        fileManager.InitializeAutoSave();
+        SceneManager.LoadScene("DifficultiesSelectionScene");
     }
 
-    private void DeleteAutoSave()
-    {
-        try
-        {
-            File.Delete(autoSaveFile);
-            Debug.Log($"Deleted existing autosave file: {autoSaveFile}");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"Error deleting autosave file: {ex.Message}");
-        }
-    }
-
-    private void CreateAutoSave()
-    {
-        try
-        {
-            File.WriteAllText(autoSaveFile, "");
-            Debug.Log($"Created new autosave file at: {autoSaveFile}");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"Error creating autosave file: {ex.Message}");
-        }
-    }
-
-    private void CreateGlobalConfig()
-    {
-        string defaultConfigJson = "{\"setting1\": \"value1\", \"setting2\": true}";
-        File.WriteAllText(globalConfigFile, defaultConfigJson);
-        Debug.Log($"Created new global.config.json at: {globalConfigFile}");
-    }
-
+    [UsedInConfig]
     private void LoadGame()
     {
         Debug.Log("Load game functionality not implemented.");
     }
 
+    [UsedInConfig]
     private void OpenConfig()
     {
         Debug.Log("Config menu functionality not implemented.");
     }
 
+    [UsedInConfig]
     private void OpenExtras()
     {
         Debug.Log("Extras functionality not implemented.");
     }
 
+    [UsedInConfig]
     private void QuitGame()
     {
 #if UNITY_EDITOR
@@ -184,7 +142,7 @@ public class MainMenu : UIControllerBase
     {
         GameObject buttonObj = new GameObject(buttonId);
         buttonObj.AddComponent<RectTransform>();
-        buttonObj.transform.SetParent(mainMenuCanvas.transform, false);
+        buttonObj.transform.SetParent(canvas.transform, false);
         return buttonObj;
     }
 

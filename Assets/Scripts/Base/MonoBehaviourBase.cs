@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class MonoBehaviourBase : MonoBehaviour
 {
+
+    protected FileManagerBase fileManager;
+    protected float screenWidth = Screen.width;
+    protected float screenHeight = Screen.height;
     protected virtual void Awake()
     {
-        // Perform any checks or setups necessary before the game starts
+        fileManager = new FileManagerBase();
     }
 
     protected virtual void Start()
