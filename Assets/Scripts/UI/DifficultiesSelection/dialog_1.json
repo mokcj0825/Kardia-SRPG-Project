@@ -1,0 +1,14 @@
+{
+  "steps": [
+    {
+      "text": "Hello, please enter your name.",
+      "position": "Bottom"
+    }
+  ],
+  "onEnd": {
+    "action": "promptTextInput",
+    "options": [],
+    "targetVariable": "username",
+    "needConfirm": true
+  }
+}

@@ -15,7 +15,7 @@ public class DifficultiesSelection : UIControllerBase
     {
         base.Start();
         LoadGlobalConfig();
-        CreateUi();
+        LoadDialogScript(Path.Combine(Application.dataPath, "Scripts/UI/DifficultiesSelection/dialog_1.json"));
         DisplayNextMessage();
     }
 
@@ -32,19 +32,10 @@ public class DifficultiesSelection : UIControllerBase
 
     }
 
-    private void CreateUi()
+    private void LoadDialogScript(string filePath)
     {
-        messages = new List<MessageData>
-        {
-            new MessageData("Welcome to the game, please enter your name - Bottom", MessagePosition.Bottom),
-            new MessageData("Welcome to the game, please enter your name - Top", MessagePosition.Top),
-            new MessageData("Welcome to the game, please enter your name - Middle", MessagePosition.Middle),
-            new MessageData("Welcome to the game, please enter your name - Bottom 2", MessagePosition.Bottom)
-        };
-
-        //ShowMessage("Welcome to the game, please enter your name.", MessagePosition.Bottom);
-        //ShowMessage("Welcome to the game, please enter your name Middle.", MessagePosition.Middle);
-        //ShowMessage("Welcome to the game, please enter your name Top.", MessagePosition.Top);
+        string jsonText = File.ReadAllText(filePath);
+        message = JsonUtility.FromJson<MessageData>(jsonText);
     }
 
     private void SetDifficulty(string difficulty)

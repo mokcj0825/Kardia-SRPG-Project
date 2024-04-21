@@ -1,0 +1,22 @@
+{
+  "steps": [
+    {
+      "text": "Welcome {username}, this is your new name.",
+      "position": "Bottom",
+    },
+    {
+      "text": "Please select difficulty.",
+      "position": "Bottom",
+    }
+  ],
+  "onEnd": {
+    "action": "promptDifficultySelection",
+    "options": [
+      {"selection": "Easy", "description": "Low enemy level"},
+      {"selection": "Medium", "description": "Normal enemy level"},
+      {"selection": "Hard", "description": "High enemy level"}
+    ],
+    "targetVariable": "difficulty",
+    "needConfirm": true
+  }
+}

@@ -11,8 +11,8 @@ public class UIControllerBase : MonoBehaviourBase
     private Text middleText;
     private Text bottomText;
 
-    protected List<MessageData> messages;
-    private int currentMessageIndex = 0;
+    protected MessageData message;
+    private int currentStepIndex = 0;
 
     // Use this method to initialize any UI components
     protected override void Start()
@@ -146,22 +146,22 @@ public class UIControllerBase : MonoBehaviourBase
         // Example: Set it to cover the bottom part of the screen
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
         rectTransform.anchorMin = new Vector2(0, 0);
-        rectTransform.anchorMax = new Vector2(1, 0.3f); // Cover bottom 30% of the screen
-        rectTransform.anchoredPosition = new Vector2(0, 0);
+        rectTransform.anchorMax = new Vector2(1, 0.8f); // Cover bottom 30% of the screen
+        rectTransform.anchoredPosition = new Vector2(0, 1);
         rectTransform.sizeDelta = new Vector2(0, 0);
     }
 
     protected void DisplayNextMessage()
     {
-        if(currentMessageIndex < messages.Count)
+        if(currentStepIndex < message.steps.Length)
         {
-            MessageData message = messages[currentMessageIndex];
-            ShowMessage(message.Text, message.Position);
-            currentMessageIndex++;
+            MessageDataStep step = message.steps[currentStepIndex];
+            ShowMessage(step.text, step.position);
+            currentStepIndex++;
         } else
         {
-            //currentMessageIndex = 0;
-            Debug.Log("End of message.");
+            currentStepIndex = 0;
+            Debug.Log("Current message display completed.");
         }
     }
 }

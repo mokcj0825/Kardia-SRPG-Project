@@ -1,12 +1,33 @@
 ﻿[System.Serializable]
 public class MessageData
 {
-    public string Text;
-    public MessagePosition Position;
+    public MessageDataStep[] steps;
 
-    public MessageData(string text, MessagePosition position)
-    {
-        Text = text;
-        Position = position;
-    }
+
+    public MessageDataEndHandler onEnd;
+
+}
+
+[System.Serializable]
+public class MessageDataStep
+{
+    public string text;
+    public MessagePosition position;
+}
+
+[System.Serializable]
+public class MessageDataEndHandler
+{
+    public string action;
+    public EndHandlerOption[] options;
+    public string targetVariable;
+    public bool needConfirm;
+
+}
+
+[System.Serializable]
+public class EndHandlerOption
+{
+    public string selection;
+    public string description;
 }
