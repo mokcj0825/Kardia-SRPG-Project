@@ -10,9 +10,6 @@ public class UIControllerBase : MonoBehaviourBase
     private Text topText;
     private Text middleText;
     private Text bottomText;
-    protected TextboxService textboxService = TextboxService.Instance;
-    protected GameObject services;
-    //private GameObject inputObject;
 
     protected MessageData message;
     private int currentStepIndex = 0;
@@ -22,18 +19,6 @@ public class UIControllerBase : MonoBehaviourBase
     {
         base.Start();
         InitializeUI();
-        services = new GameObject("Services");
-        services.AddComponent<TextboxService>();
-        textboxService = services.GetComponent<TextboxService>();
-        if(textboxService != null)
-        {
-            Debug.Log("Textbox Service not null");
-            textboxService.ShowText("Testing message", TextboxPosition.Top);
-        } else
-        {
-            Debug.Log("Textbox Service is null");
-        }
-        
     }
 
     // Initialize UI elements here. This can be overridden by subclasses for specific UI setups.
@@ -42,6 +27,9 @@ public class UIControllerBase : MonoBehaviourBase
         canvas = FindObjectOfType<Canvas>();
         canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(screenWidth, screenHeight);
         AddCanvasOnClickListener();
+        topText = CreateTextObject("TopText", screenHeight * 0.75f);
+        middleText = CreateTextObject("MiddleText", screenHeight * 0.5f);
+        bottomText = CreateTextObject("BottomText", screenHeight * 0.25f);
     }
 
     // Shows a UI element. Could be overridden to include animations or additional logic.
@@ -76,6 +64,22 @@ public class UIControllerBase : MonoBehaviourBase
     {
         // Implementation for showing in-game notifications or messages
         // Could be used for tooltips, hints, or other brief messages to the player
+    }
+
+    Text CreateTextObject(string name, float verticalPosition)
+    {
+        GameObject textObj = new GameObject(name);
+        textObj.transform.SetParent(canvas.transform, false);
+
+        Text textComponent = textObj.AddComponent<Text>();
+        textComponent.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        textComponent.fontSize = 24;
+        textComponent.alignment = TextAnchor.MiddleCenter;
+        textComponent.rectTransform.sizeDelta = new Vector2(screenWidth * 0.9f, screenHeight * 0.15f);
+        textComponent.rectTransform.anchoredPosition = new Vector2(0, verticalPosition - screenHeight / 2);
+        textComponent.enabled = false;
+
+        return textComponent;
     }
 
     protected void ShowMessage(string message, MessagePosition position)

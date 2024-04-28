@@ -22,7 +22,7 @@ public class MessageDataEndHandler
     public EndHandlerOption[] options;
     public string targetVariable;
     public bool needConfirm;
-
+    public string nextScript;
 }
 
 [System.Serializable]

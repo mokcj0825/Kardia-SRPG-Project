@@ -9,6 +9,7 @@
     "action": "promptTextInput",
     "options": [],
     "targetVariable": "username",
-    "needConfirm": true
+    "needConfirm": true,
+    "nextScript": "dialog_2.json"
   }
 }
